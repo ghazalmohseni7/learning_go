@@ -13,8 +13,9 @@ import (
 )
 
 func ListCamera(w http.ResponseWriter, r *http.Request) {
+
 	var cameras []CameraSchema
-	errorConnection := utils.Connect()
+	errorConnection := utils.Connect("TEST")
 	if errorConnection != nil {
 		http.Error(w, "can not connect to db\n"+errorConnection.Error(), http.StatusBadRequest)
 		return
@@ -47,30 +48,30 @@ func ListCamera(w http.ResponseWriter, r *http.Request) {
 	}
 }
 func InsertCamera(w http.ResponseWriter, r *http.Request) {
+
 	var postdata CameraSchema
 	var validate = validator.New()
-	errconnections := utils.Connect()
+	errconnections := utils.Connect("TEST")
 	if errconnections != nil {
 		http.Error(w, "can not connect to db\n"+errconnections.Error(), http.StatusInternalServerError)
 		return
 	}
-	fmt.Println("here is the r.body : ", r.Body)
 
 	decoder := json.NewDecoder(r.Body)
-	fmt.Println("here is the decoder : ", decoder)
+
 	errdecoder := decoder.Decode(&postdata)
-	fmt.Println("here is the decoded data : ", postdata)
+
 	if errdecoder != nil {
 		http.Error(w, "Error happed during decoding json\n"+errdecoder.Error(), http.StatusBadRequest)
 		return
 	}
-	fmt.Println("now we have data in structure  . lets validate it")
+
 	validateerror := validate.Struct(postdata)
 	if validateerror != nil {
 		http.Error(w, validateerror.Error(), http.StatusBadRequest)
 		return
 	}
-	fmt.Println("now we can insert the data")
+
 	camera_collection := utils.GetCollection("camera")
 	insertResult, inserterror := camera_collection.InsertOne(context.Background(), postdata)
 	if inserterror != nil {
@@ -90,8 +91,7 @@ func InsertCamera(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	fmt.Println(insertResult)
-	fmt.Println(insertResult.InsertedID)
+
 	w.Write(responseJson)
 
 }
@@ -109,30 +109,30 @@ func UpdateCamera(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "invalid ObjectId format\n", http.StatusBadRequest)
 		return
 	}
-	fmt.Println(recordId)
+	//fmt.Println(recordId)
 	var updateDate CameraSchema
 	var validate = validator.New()
-	errorConnection := utils.Connect()
+	errorConnection := utils.Connect("TEST")
 	if errorConnection != nil {
 		http.Error(w, "can not connect to db\n"+errorConnection.Error(), http.StatusBadRequest)
 		return
 	}
-	fmt.Println("here is the r.body : \n", r.Body)
+	//fmt.Println("here is the r.body : \n", r.Body)
 	decoder := json.NewDecoder(r.Body)
 	errorDecoder := decoder.Decode(&updateDate)
 	if errorDecoder != nil {
 		http.Error(w, "some error in data you send\n"+errorDecoder.Error(), http.StatusBadRequest)
 		return
 	}
-	fmt.Println("here is the data i got from json \n")
-	fmt.Println(updateDate)
+	//fmt.Println("here is the data i got from json ")
+	//fmt.Println(updateDate)
 	errorValidation := validate.Struct(updateDate)
 	if errorValidation != nil {
 		http.Error(w, "send the correct data\n"+errorValidation.Error(), http.StatusBadRequest)
 		return
 	}
-	fmt.Println("here is the validated data\n")
-	fmt.Println(updateDate)
+	//fmt.Println("here is the validated data")
+	//fmt.Println(updateDate)
 	camera_collection := utils.GetCollection("camera")
 	filter := bson.D{{"_id", objectID}}
 	udpate := bson.D{
@@ -144,8 +144,8 @@ func UpdateCamera(w http.ResponseWriter, r *http.Request) {
 			{"packageid", updateDate.PackageId},
 		}},
 	}
-	fmt.Println(udpate)
-	fmt.Println("VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVvvvv\n")
+	//fmt.Println(udpate)
+	//fmt.Println("VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVvvvv")
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	updateResult, errorUpdate := camera_collection.UpdateOne(ctx, filter, udpate)
@@ -154,7 +154,7 @@ func UpdateCamera(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "some error during update \n"+errorUpdate.Error(), http.StatusBadRequest)
 		return
 	}
-	fmt.Println("record is updateddddd")
+	//fmt.Println("record is updateddddd")
 	fmt.Println(updateResult)
 
 	response := map[string]interface{}{
@@ -172,12 +172,13 @@ func UpdateCamera(w http.ResponseWriter, r *http.Request) {
 	w.Write(responseJson)
 }
 func DeleteCamera(w http.ResponseWriter, r *http.Request) {
+
 	recordId := r.URL.Query().Get("id")
 	if recordId == "" {
 		http.Error(w, "enter the valid id\n", http.StatusBadRequest)
 		return
 	}
-	errorConnection := utils.Connect()
+	errorConnection := utils.Connect("TEST")
 	if errorConnection != nil {
 		http.Error(w, "can not connect to db\n"+errorConnection.Error(), http.StatusBadRequest)
 		return
@@ -212,12 +213,13 @@ func DeleteCamera(w http.ResponseWriter, r *http.Request) {
 
 }
 func RetrieveCamera(w http.ResponseWriter, r *http.Request) {
+
 	recordId := r.URL.Query().Get("id")
 	if recordId == "" {
 		http.Error(w, "send valid id \n", http.StatusBadRequest)
 		return
 	}
-	errorConnection := utils.Connect()
+	errorConnection := utils.Connect("TEST")
 	if errorConnection != nil {
 		http.Error(w, "can not connect to db\n"+errorConnection.Error(), http.StatusBadRequest)
 		return

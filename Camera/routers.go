@@ -11,6 +11,7 @@ func CameraRouters(mux *http.ServeMux) {
 		if r.Method == http.MethodGet {
 			ListCamera(w, r)
 		} else {
+
 			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		}
 	})
