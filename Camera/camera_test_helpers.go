@@ -241,6 +241,6 @@ func RunAllTests(t *testing.T) {
 	t.Run("InsertCamera", TestInsertCamera)
 	t.Run("UpdateCamera", TestUpdateCamera)
 	t.Run("DeleteCamera", TestDeleteCamera)
-	return
+	//return
 
 }
